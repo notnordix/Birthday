@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Count Down Timer</title>
+  <style>
+    .countdown-namespace * {
+      box-sizing: border-box;
+    }
+
+    .countdown-namespace {
+      height: 100vh;
+      margin: 0;
+      padding: 2rem;
+      background-color: hsl(0, 0%, 0%);
+      display: grid;
+      gap: 1rem;
+      align-content: center;
+      justify-content: center;
+    }
+
+    .countdown-namespace h1 {
+      font-family: system-ui, sans-serif;
+      color: hsl(0, 0%, 100%);
+      text-align: center;
+    }
+
+    .countdown-namespace h1>span:last-of-type {
+      color: gold;
+    }
+
+    .countdown-namespace .countdown {
+      font-family: system-ui, sans-serif;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      width: min(60rem, 100%);
+      margin-inline: auto;
+    }
+
+    .countdown-namespace .countdown .part {
+      aspect-ratio: 1 / 1;
+      display: grid;
+      place-items: center;
+    }
+
+    .countdown-namespace .countdown .remaining {
+      grid-area: 1 / 1;
+      color: hsl(0, 0%, 100%);
+      display: grid;
+      text-align: center;
+      font-size: 4cqi;
+    }
+
+    .countdown-namespace .countdown .number {
+      color: hsl(0, 0%, 100%);
+    }
+
+    .countdown-namespace .countdown .text {
+      color: hsl(0, 0%, 62%);
+      text-transform: uppercase;
+      font-size: 0.5em;
+    }
+
+    .countdown-namespace .dot-container {
+      grid-area: 1 / 1;
+      width: 100%;
+      height: 4%;
+      transform-origin: center;
+      rotate: calc(360deg / var(--dots) * var(--dot-idx) - -90deg);
+    }
+
+    .countdown-namespace .dot {
+      width: 100%;
+      height: 100%;
+      transform-origin: top;
+      transform: rotate(90deg);
+      width: 4%;
+      aspect-ratio: 1 / 1;
+      background-color: hsla(0, 0%, 10%);
+      border-radius: 50%;
+      transition: background-color 0.25s;
+    }
+
+    .countdown-namespace .dot[data-active="true"] {
+      background-color: gold;
+    }
+
+    .countdown-namespace .dot[data-lastactive="true"] {
+      background-color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="countdown-namespace">
+    <h1>Countdown Until Your <span>Next Birthday</span></h1>
+    <div class="countdown" data-target-date="2025-07-27T00:00:00"></div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const countdownEls = document.querySelectorAll(".countdown-namespace .countdown");
+      countdownEls.forEach(countdownEl => createCountdown(countdownEl));
+    });
+
+    function createCountdown(countdownEl) {
+      const targetDate = new Date(countdownEl.dataset.targetDate);
+      const parts = createCountdownParts();
+      appendPartsToCountdown(countdownEl, parts);
+      updateCountdown(targetDate, parts);
+
+      setInterval(() => updateCountdown(targetDate, parts), 1000);
+    }
+
+    function createCountdownParts() {
+      return {
+        days: { text: ["days", "day"], dots: 30 },
+        hours: { text: ["hours", "hour"], dots: 24 },
+        minutes: { text: ["minutes", "minute"], dots: 60 },
+        seconds: { text: ["seconds", "second"], dots: 60 }
+      };
+    }
+
+    function appendPartsToCountdown(countdownEl, parts) {
+      Object.entries(parts).forEach(([key, value]) => {
+        const partEl = document.createElement("div");
+        partEl.classList.add("part", key);
+        partEl.style.setProperty("--dots", value.dots);
+
+        const remainingEl = document.createElement("div");
+        remainingEl.classList.add("remaining");
+        remainingEl.innerHTML = `
+          <span class="number"></span>
+          <span class="text"></span>
+        `;
+        partEl.append(remainingEl);
+
+        for (let i = 0; i < value.dots; i++) {
+          const dotContainerEl = document.createElement("div");
+          dotContainerEl.style.setProperty("--dot-idx", i);
+          dotContainerEl.classList.add("dot-container");
+
+          const dotEl = document.createElement("div");
+          dotEl.classList.add("dot");
+          dotContainerEl.append(dotEl);
+
+          partEl.append(dotContainerEl);
+        }
+        countdownEl.append(partEl);
+        value.element = partEl;
+      });
+    }
+
+    function updateCountdown(target, parts) {
+      const now = new Date();
+      const timeDiff = Math.max(0, target - now);
+
+      const seconds = Math.floor(timeDiff / 1000) % 60;
+      const minutes = Math.floor(timeDiff / 60000) % 60;
+      const hours = Math.floor(timeDiff / 3600000) % 24;
+      const days = Math.floor(timeDiff / 86400000);
+
+      const remainingTimes = { days, hours, minutes, seconds };
+
+      Object.entries(remainingTimes).forEach(([key, value]) => {
+        const partEl = parts[key].element;
+        partEl.querySelector(".number").innerText = value;
+        partEl.querySelector(".text").innerText = parts[key].text[value === 1 ? 1 : 0];
+
+        const dots = partEl.querySelectorAll(".dot");
+        dots.forEach((dot, idx) => {
+          dot.dataset.active = idx < value;
+          dot.dataset.lastactive = idx === value;
+        });
+      });
+    }
+  </script>
+</body>
+
+</html>

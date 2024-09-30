@@ -1,0 +1,85 @@
+.countdown-namespace * {
+    box-sizing: border-box;
+}
+
+.countdown-namespace {
+    height: 100vh;
+    margin: 0;
+    padding: 2rem;
+    background-color: hsl(0, 0%, 0%);
+    display: grid;
+    gap: 1rem;
+    align-content: center;
+    justify-content: center;
+}
+
+.countdown-namespace h1 {
+    font-family: system-ui, sans-serif;
+    color: hsl(0, 0%, 100%);
+    text-align: center;
+}
+
+.countdown-namespace h1>span:last-of-type {
+    color: gold;
+}
+
+.countdown-namespace .countdown {
+    font-family: system-ui, sans-serif;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    width: min(60rem, 100%);
+    margin-inline: auto;
+}
+
+.countdown-namespace .countdown .part {
+    aspect-ratio: 1 / 1;
+    display: grid;
+    place-items: center;
+}
+
+.countdown-namespace .countdown .remaining {
+    grid-area: 1 / 1;
+    color: hsl(0, 0%, 100%);
+    display: grid;
+    text-align: center;
+    font-size: 4cqi;
+}
+
+.countdown-namespace .countdown .number {
+    color: hsl(0, 0%, 100%);
+}
+
+.countdown-namespace .countdown .text {
+    color: hsl(0, 0%, 62%);
+    text-transform: uppercase;
+    font-size: 0.5em;
+}
+
+.countdown-namespace .dot-container {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: 4%;
+    transform-origin: center;
+    rotate: calc(360deg / var(--dots) * var(--dot-idx) - -90deg);
+}
+
+.countdown-namespace .dot {
+    width: 100%;
+    height: 100%;
+    transform-origin: top;
+    transform: rotate(90deg);
+    width: 4%;
+    aspect-ratio: 1 / 1;
+    background-color: hsla(0, 0%, 10%);
+    border-radius: 50%;
+    transition: background-color 0.25s;
+}
+
+.countdown-namespace .dot[data-active="true"] {
+    background-color: gold;
+}
+
+.countdown-namespace .dot[data-lastactive="true"] {
+    background-color: red;
+}
